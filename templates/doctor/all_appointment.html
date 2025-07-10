@@ -1,0 +1,56 @@
+{% extends 'doctor/doctor_base.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="page-header shadow-sm">
+        <h1 class="fw-bold text-center">All Appointments</h1>
+        <p class="lead text-center">View every appointment including cancelled ones.</p>
+    </div>
+
+    {% if appointments %}
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Patient</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.date }}</td>
+                            <td>{{ appointment.time|time:"h:i A" }}</td>
+                            <td>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</td>
+                            <td>{{ appointment.reason|default:"—" }}</td>
+                            <td>
+                                {% if appointment.status == "Completed" %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif appointment.status == 'Pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif appointment.status == 'Confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                        <a href="{% url 'prescribe_patient' appointment.patient.id appointment.id %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-prescription-bottle-alt"></i> Prescribe</a>
+                                {% elif appointment.status == 'Cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>No appointments available.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

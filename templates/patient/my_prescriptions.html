@@ -1,0 +1,80 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="page-header text-center mb-4">
+        <h2 class="text-uppercase">📝 My Prescriptions</h2>
+        <p class="lead">View and download your prescriptions. Payment required for full access.</p>
+    </div>
+
+    {% if prescriptions %}
+        <div class="row">
+            {% for pres in prescriptions %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h5 class="mb-0 text-primary">
+                                    <i class="fas fa-user-md me-1"></i>
+                                    Dr. {{ pres.doctor.get_full_name|default:pres.doctor.username }}
+                                </h5>
+                                <small class="text-muted">
+                                    {{ pres.appointment.date|date:"M d, Y" }} at {{ pres.appointment.time|time:"h:i A" }}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                {% if pres.bill %}
+                                    {% if pres.bill.is_paid %}
+                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Paid</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pending</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-secondary"><i class="fas fa-hourglass-start me-1"></i> Not Billed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        {% if pres.bill %}
+                            {% if pres.bill.is_paid %}
+
+                                <h6 class="text-success fw-bold mb-2">
+                                    <i class="fas fa-notes-medical me-1"></i> {{ pres.diagnosis }}
+                                </h6>
+                                <p class="mb-2"><strong>Medications:</strong><br>{{ pres.medications }}</p>
+                                {% if pres.notes %}
+                                <p class="mb-2"><strong>Notes:</strong><br>{{ pres.notes }}</p>
+                                {% endif %}
+                                <div class="text-muted small mt-2">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Issued on {{ pres.date_issued|date:"F d, Y @ h:i A" }}
+                                </div>
+                            {% else %}
+                                <!-- Payment Needed -->
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-lock me-1"></i> Full prescription will be visible after payment.
+                                </div>
+                                <a href="{% url 'pay_prescription_bill' pres.bill.id %}" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-credit-card me-1"></i> Pay ₹{{ pres.bill.amount }} to View
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-1"></i> Bill not yet created by admin.
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fas fa-info-circle me-1"></i> No prescriptions available yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

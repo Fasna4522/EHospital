@@ -1,0 +1,50 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="page-header">
+        <h2>📚 My Medical History</h2>
+        <p class="lead">View your past diagnoses, treatments, and doctor consultations.</p>
+    </div>
+
+    {% if history %}
+    <div class="table-responsive mt-4">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="text-white" style="background-color: #002244;">
+                    <tr>
+                        <th>Date</th>
+                        <th>Doctor</th>
+                        <th>Diagnosis</th>
+                        <th>Medications</th>
+                        <th>Allergies</th>
+                        <th>Treatment Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in history %}
+                    <tr>
+                        <td>{{ record.date }}</td>
+                        <td>
+                            {% if record.doctor %}
+                                Dr. {{ record.doctor.get_full_name|default:record.doctor.username }}
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.diagnosis }}</td>
+                        <td>{{ record.medications }}</td>
+                        <td>{{ record.allergies }}</td>
+                        <td>{{ record.treatment_notes }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mt-4">
+        <i class="fas fa-info-circle me-2"></i>No medical history available.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

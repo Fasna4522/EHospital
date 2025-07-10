@@ -1,0 +1,87 @@
+{% extends 'adminpanel/admin_base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    h2 {
+        color: #003366;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+    .form-control {
+        border-radius: 8px;
+    }
+    .btn-primary {
+        background-color: #003366;
+        border: none;
+    }
+    .btn-primary:hover {
+        background-color: #002244;
+    }
+    .btn-secondary {
+        border-radius: 8px;
+    }
+    .table {
+        background: transparent;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    .table thead th {
+        background: #003366;
+        color: white;
+        padding: 14px;
+    }
+    .table tbody td {
+        background: transparent;
+        vertical-align: middle;
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .table tbody tr:hover {
+        background-color: #f1f7ff;
+    }
+</style>
+<div class="container mt-5">
+    <h2><i class="fas fa-calendar-check me-2"></i>Appointment Management</h2>
+
+    <form method="get" class="row mb-4">
+        <div class="col-md-4">
+            <input type="text" name="doctor" value="{{ doctor_name }}" class="form-control" placeholder="Filter by Doctor">
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="patient" value="{{ patient_name }}" class="form-control" placeholder="Filter by Patient">
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-primary">Filter</button>
+            <a href="{% url 'manage_appointments' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in appointments %}
+                <tr>
+                    <td>{{ app.date }}</td>
+                    <td>{{ app.time }}</td>
+                    <td>{{ app.patient.username }}</td>
+                    <td>{{ app.doctor.display_name }}</td>
+                    <td>{{ app.reason|default:"—" }}</td>
+                    <td>{{ app.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

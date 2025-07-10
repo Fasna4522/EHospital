@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Hospitality | Admin Dashboard</title>
+    {{ csrf_input }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #fdfaf5;
+            color: #212529;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+            background-color: #002244 !important;
+        }
+
+        .dashboard-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid #003366;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .nav-link {
+            color: #ffffff;
+            margin-right: 1.2rem;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffcc00;
+            text-decoration: none;
+        }
+
+        .logout-form button {
+            font-size: 0.9rem;
+        }
+
+        .page-header {
+            background: linear-gradient(120deg, #003366, #002244);
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .page-header p.lead {
+            font-size: 1.1rem;
+            color: #ffe082;
+        }
+
+        .page-header small {
+            font-size: 0.95rem;
+            color: #f0f0f0;
+        }
+
+        .quick-links .card {
+            transition: all 0.2s ease-in-out;
+            border: none;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .quick-links .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-links .card h5 {
+            color: #003366;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary {
+            border-color: #003366;
+            color: #003366;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #003366;
+            color: #fff;
+        }
+
+        .navbar {
+            background-color: #002244 !important;
+            font-size: 1rem;
+            min-height: 70px;
+        }
+
+        footer p {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold me-5 fs-4" href="/" style="font-family: 'Poppins', sans-serif; color: #f4c430; letter-spacing: 1.2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.05);">
+                <i class="fas fa-hospital-symbol me-2" style="font-size: 1.4rem; color: #f4c430;"></i> E-Hospitality
+            </a>
+            <div class="d-flex flex-grow-1 align-items-center ms-5 gap-4">
+                <a href="{% url 'admin_dashboard' %}" class="nav-link" style="font-size: 1.075rem;">Home</a>
+                <a href="{% url 'user_list' %}" class="nav-link" style="font-size: 1.075rem;">Manage Users</a>
+                <a href="{% url 'manage_facilities' %}" class="nav-link" style="font-size: 1.075rem;">Facilities</a>
+                <a href="{% url 'manage_appointments' %}" class="nav-link" style="font-size: 1.075rem;">Appointments</a>
+
+            </div>
+            <div class="dropdown ms-auto">
+                <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0D8ABC&color=fff" alt="avatar" width="36" height="36" class="rounded-circle me-2">
+                    <strong>{{ request.user.username }}</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end text-small shadow-sm" aria-labelledby="dropdownUser" style="min-width: 260px; border-radius: 10px;">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0D8ABC&color=fff" width="40" height="40" class="rounded-circle me-2">
+                            <div>
+                                <strong>{{ request.user.username }}</strong><br>
+                                <small class="text-muted">Administrator</small>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="px-3 py-2 border-bottom">
+                        <i class="fas fa-envelope me-2 text-secondary"></i><small class="text-muted">{{ request.user.email }}</small>
+                    </li>
+                    <li class="px-3 py-2 border-bottom">
+                        <i class="fas fa-clock me-2 text-secondary"></i><small class="text-muted">Last login: {{ request.user.last_login }}</small>
+                    </li>
+                    <li class="px-3 py-2">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+    <div class="container main-content mt-4" style="max-width: 90%;">
+        <div class="page-header" style="padding: 20px 16px; background: linear-gradient(135deg, #003366, #002c54, #002244);">
+            <h1 class="mb-2" style="font-size: 2.2rem;"><i class="fas fa-user-shield me-2"></i>Welcome, {{ request.user.username }}!</h1>
+            <p class="lead" style="font-size: 1rem; color: #ffe082;">Manage the lifeline of your hospital efficiently and professionally.</p>
+            <p class="lead mt-0 mb-1" style="font-size: 0.95rem; color: #ffe082;">This dashboard allows you to keep track of patients, doctors, appointments, billing, and facilities — all from one place. Use the quick links below to access essential administrative operations.</p>
+        </div>
+
+        {% if total_patients is not None %}
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card dashboard-card text-center p-4">
+                    <h6 class="text-muted">Total Patients</h6>
+                    <h2 class="text-primary fw-bold mt-2">{{ total_patients }}</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card text-center p-4">
+                    <h6 class="text-muted">Total Doctors</h6>
+                    <h2 class="text-primary fw-bold mt-2">{{ total_doctors }}</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card text-center p-4">
+                    <h6 class="text-muted">Appointments</h6>
+                    <h2 class="text-primary fw-bold mt-2">{{ total_appointments }}</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card text-center p-4">
+                    <h6 class="text-muted">Pending Bills</h6>
+                    <h2 class="text-primary fw-bold mt-2">{{ pending_bills }}</h2>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <h4 class="mb-3">Quick Access</h4>
+        <div class="row quick-links mb-5">
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm" style="box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);">
+                    <h5><i class="fas fa-users-cog me-2"></i>View & Edit Users</h5>
+                    <p class="text-muted">Manage patients and doctors. Change roles or remove inactive accounts.</p>
+                    <a href="{% url 'user_list' %}" class="btn btn-sm" style="background-color: #003366; color: #fff;">Go to Users</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm" style="box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);">
+                    <h5><i class="fas fa-building me-2"></i>Hospital Facilities</h5>
+                    <p class="text-muted">Add or update departments and locations across hospital branches.</p>
+                    <a href="{% url 'manage_facilities' %}" class="btn btn-sm" style="background-color: #003366; color: #fff;">Manage Facilities</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm" style="box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);">
+                    <h5><i class="fas fa-calendar-check me-2"></i>Appointments Monitor</h5>
+                    <p class="text-muted">Review, search, and filter upcoming and past appointments.</p>
+                    <a href="{% url 'manage_appointments' %}" class="btn btn-sm" style="background-color: #003366; color: #fff;">Check Appointments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+</div>
+
+<footer class="text-white text-center py-3">
+    <div class="container">
+        <p class="mb-0">&copy; {{ now.year }} E-Hospitality. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

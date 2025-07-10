@@ -1,0 +1,81 @@
+{% extends 'doctor/doctor_base.html' %}
+{% block content %}
+<div class="container mt-3 mb-5">
+
+
+    <div class="page-header mb-4 text-center">
+        <h2 class="text-uppercase">Medical History</h2>
+        <p class="lead">Patient: <strong>{{ patient.get_full_name|default:patient.username }}</strong></p>
+    </div>
+
+
+    <div class="card border-0 shadow-lg rounded-4 mb-5" style="box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+        <div class="card-body px-4 py-4">
+            <h5 class="mb-3" style="color:#002244;"><i class="fas fa-notes-medical me-2"></i>Add New Record</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" style="color:#002244;">Diagnosis</label>
+                        <input name="diagnosis" class="form-control border rounded-3" placeholder="Enter diagnosis" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" style="color:#002244;">Medications</label>
+                        <input name="medications" class="form-control border rounded-3" placeholder="Prescribed medications">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" style="color:#002244;">Allergies</label>
+                        <input name="allergies" class="form-control border rounded-3" placeholder="Known allergies">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" style="color:#002244;">Treatment Notes</label>
+                        <textarea name="treatment_notes" rows="3" class="form-control border rounded-3" placeholder="Detailed notes..."></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-outline-dark mt-3 px-4">
+                            <i class="fas fa-save me-1"></i> Save Record
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="card border-0 shadow-lg rounded-4" style="box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+        <div class="card-body px-4 py-4">
+            <h5 class="mb-3" style="color:#002244;"><i class="fas fa-history me-2"></i>Past Medical Records</h5>
+            {% if history %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead style="background-color:#002244;" class="text-white">
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Diagnosis</th>
+                            <th scope="col">Medications</th>
+                            <th scope="col">Allergies</th>
+                            <th scope="col">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in history %}
+                        <tr>
+                            <td>{{ record.date }}</td>
+                            <td>{{ record.diagnosis }}</td>
+                            <td>{{ record.medications }}</td>
+                            <td>{{ record.allergies }}</td>
+                            <td>{{ record.treatment_notes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center mb-0">
+                <i class="fas fa-info-circle me-1"></i> No medical history found for this patient.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

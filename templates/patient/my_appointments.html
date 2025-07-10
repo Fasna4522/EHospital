@@ -1,0 +1,150 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="page-header">
+        <h2>📅 My Appointments</h2>
+        <p class="lead">Manage your upcoming consultations and reschedule if needed.</p>
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-hover table-borderless mb-0 align-middle">
+
+            <thead style="background-color: #002244;" class="text-white">
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Doctor</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in appointments %}
+                <tr>
+                    <td>{{ app.date }}</td>
+                    <td>{{ app.time|time:"h:i A" }}</td>
+                    <td>{{ app.doctor.display_name}}</td>
+                    <td>{{ app.reason|default:"—" }}</td>
+                    <td>
+                        {% if app.status == "Completed" %}
+                            <span class="badge bg-success">Completed</span>
+                        {% elif app.status == "Pending" %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif app.status == "Confirmed" %}
+                            <span class="badge bg-success">Confirmed</span>
+                        {% elif app.status == "Cancelled" %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if app.status != "Cancelled" %}
+                            <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ app.id }}">Reschedule</button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ app.id }}">Delete</button>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <div class="modal fade" id="rescheduleModal{{ app.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="post" action="{% url 'reschedule_appointment' app.id %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reschedule Appointment</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>New Date</label>
+                                        <input type="date" name="new_date" class="form-control" min="{{ today }}" onchange="fetchSlots('{{ app.doctor.id }}', '{{ app.id }}', this.value)" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>New Time</label>
+                                        <select name="new_time" class="form-select" id="slot-options-{{ app.id }}" required>
+                                            <option value="">Select time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Reschedule</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal fade" id="cancelModal{{ app.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="post" action="{% url 'cancel_appointment' app.id %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-danger">Confirm Cancel</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to cancel your appointment with <strong>{{ app.doctor.username }}</strong> on {{ app.date }} at {{ app.time|time:"h:i A" }}?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-danger">Yes, Cancel</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>No appointments found.
+    </div>
+    {% endif %}
+</div>
+
+
+<script>
+function fetchSlots(doctorId, appointmentId, selectedDate) {
+    const url = `/patient/get-slots/${doctorId}/${appointmentId}/${selectedDate}/`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const slotSelect = document.getElementById(`slot-options-${appointmentId}`);
+            slotSelect.innerHTML = '<option value="">Select time</option>';
+            if (data.slots && data.slots.length > 0) {
+                data.slots.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot;
+                    option.textContent = slot;
+                    slotSelect.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.textContent = "No slots available";
+                option.disabled = true;
+                slotSelect.appendChild(option);
+            }
+        });
+}
+</script>
+{% endblock %}

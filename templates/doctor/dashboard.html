@@ -1,0 +1,91 @@
+{% extends 'doctor/doctor_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="page-header shadow-sm">
+        <h1 class="fw-bold">Welcome, Dr. {{ request.user.get_full_name|default:request.user.username }}!</h1>
+        <p class="lead"><strong>Department:</strong> {{ request.user.department.name }} ({{ request.user.department.location.name }})</p>
+        <p class="lead">Your professional dashboard at a glance.</p>
+    </div>
+
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-lg border-0 p-4 h-100">
+                <h5 class="text-muted"><i class="fas fa-users me-2 text-primary"></i>Total Patients</h5>
+                <h2 class="fw-semibold text-primary">{{ patients_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-lg border-0 p-4 h-100">
+                <h5 class="text-muted"><i class="fas fa-calendar-day me-2 text-success"></i>Today's Appointments</h5>
+                <h2 class="fw-semibold text-success">{{ today_appointments }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-lg border-0 p-4 h-100">
+                <h5 class="text-muted"><i class="fas fa-clock me-2 text-warning"></i>Upcoming Appointments</h5>
+                <h2 class="fw-semibold text-warning">{{ appointments|length }}</h2>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body">
+            <h5 class="mb-4 fw-bold"  style="color:#002244;"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
+
+            {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Patient</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.date }}</td>
+                            <td>{{ appointment.time|time:"h:i A" }}</td>
+                            <td>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</td>
+                            <td>{{ appointment.reason|default:"—" }}</td>
+                            <td>
+                                {% if appointment.status == 'Pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif appointment.status == 'Confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                {% elif appointment.status == 'Cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if appointment.status == 'Pending' %}
+                                    <a href="{% url 'update_appointment_status' appointment.id 'confirm' %}" class="btn btn-sm btn-outline-success me-2">Confirm</a>
+                                    <a href="{% url 'update_appointment_status' appointment.id 'cancel' %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                                {% elif appointment.status == 'Confirmed' %}
+                                <a href="{% url 'prescribe_patient' appointment.patient.id appointment.id %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-prescription-bottle-alt"></i> Prescribe</a>
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>No appointments scheduled yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

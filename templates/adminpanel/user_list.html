@@ -1,0 +1,135 @@
+{% extends 'adminpanel/admin_base.html' %}
+{% block content %}
+<style>
+    h2 {
+        color: #003366;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+    .table-container {
+        background: transparent;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        padding: 0;
+        margin-bottom: 50px;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: transparent;
+    }
+    .table thead th {
+        background: #003366;
+        color: white;
+        padding: 15px;
+        font-size: 1rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .table tbody td {
+        background-color: transparent;
+        vertical-align: middle;
+        text-align: center;
+        padding: 14px;
+        border-bottom: 1px solid #e1e1e1;
+    }
+    .table tbody tr:hover td {
+        background-color: #eef5ff;
+    }
+    .btn-outline-primary, .btn-outline-danger {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 8px;
+    }
+    .modal-header.bg-navy {
+        background-color: #003366;
+        color: white;
+    }
+</style>
+<div class="container mt-5">
+    <h2><i class="fas fa-users me-2"></i>All Users</h2>
+
+    {% if users %}
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                      {% if user.role == 'doctor' %}
+                        Dr. {{ user.get_full_name|default:user.username }}
+                      {% else %}
+                        {{ user.get_full_name|default:user.username }}
+                      {% endif %}
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changeRoleModal{{ user.id }}">Change Role</button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">Delete</button>
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="changeRoleModal{{ user.id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" action="{% url 'change_role' user.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header bg-navy">
+                          <h5 class="modal-title">Change Role: {{ user.username }}</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                          <select name="role" class="form-select">
+                              <option value="patient" {% if user.role == 'patient' %}selected{% endif %}>Patient</option>
+                              <option value="doctor" {% if user.role == 'doctor' %}selected{% endif %}>Doctor</option>
+                          </select>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-primary">Save changes</button>
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" action="{% url 'delete_user' user.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header bg-danger text-white">
+                          <h5 class="modal-title">Confirm Delete</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure you want to delete <strong>{{ user.username }}</strong>?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-danger">Delete</button>
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No users found.</p>
+    {% endif %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

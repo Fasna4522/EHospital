@@ -1,0 +1,40 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<style>
+    .text-navy {
+        color: #002244 !important;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+    <div class="page-header">
+        <h2><i class="fas fa-book-medical me-2"></i> Health Resources</h2>
+        <p class="lead">Explore helpful materials for your health and wellness journey.</p>
+    </div>
+
+    {% if resources %}
+    <div class="row g-4">
+        {% for res in resources %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title text-navy mb-2">{{ res.title }}</h5>
+                    <p class="card-text text-muted">{{ res.description|truncatechars:100 }}</p>
+                    {% if res.link %}
+                    <a href="{{ res.link }}" target="_blank" class="btn btn-sm btn-outline-primary">Read More</a>
+                    {% endif %}
+                    {% if res.uploaded_file %}
+                    <a href="{{ res.uploaded_file.url }}" class="btn btn-sm btn-outline-secondary ms-2">Download</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mt-4">
+        <i class="fas fa-info-circle me-2"></i>No health resources available at the moment.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

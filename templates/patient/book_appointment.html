@@ -1,0 +1,73 @@
+{% extends 'patient/patient_base.html' %}
+
+{% block content %}
+
+<div class="container mt-4 mb-5">
+    <div class="page-header">
+        <h2>📅 Book Appointments</h2>
+        <p class="lead">Manage your upcoming consultations and reschedule if needed.</p>
+    </div>
+
+<div class="container mt-5 mb-5" style="max-width: 650px;">
+    <div class="card shadow p-4">
+        <h3 class="text-center mb-4" style="color: #003366;">
+            <i class="fas fa-calendar-plus me-2" style="color: #003366;"></i>Book an Appointment
+        </h3>
+
+        {% if error %}
+            <div class="alert alert-danger text-center">{{ error }}</div>
+        {% endif %}
+
+
+        <form method="get" class="mb-4">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Choose Doctor</label>
+                <select name="doctor" class="form-select" required onchange="this.form.submit()">
+                    <option value="">-- Choose a Doctor --</option>
+                      {% for doctor in doctors %}
+                           <option value="{{ doctor.id }}" {% if selected_doctor_id == doctor.id|stringformat:"s" %}selected{% endif %}>
+                                Dr. {{ doctor.get_full_name|default:doctor.username }} – {{ doctor.department.name }} @ {{ doctor.department.location.name }}
+                            </option>
+                      {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Select Date</label>
+                <input type="date" name="date" class="form-control" min="{{ today }}" value="{{ selected_date }}" onchange="this.form.submit()" required>
+            </div>
+        </form>
+
+        {% if available_slots %}
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="doctor" value="{{ selected_doctor_id }}">
+            <input type="hidden" name="date" value="{{ selected_date }}">
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Available Time Slots</label>
+                <select name="time" class="form-select" required>
+                    {% for t in available_slots %}
+                        <option value="{{ t }}">{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Reason (optional)</label>
+                <textarea name="reason" class="form-control" rows="3" placeholder="Describe your symptoms or reason..."></textarea>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn" style="background-color: #003366; color: #fff;">
+                    <i class="fas fa-paper-plane me-1"></i> Book Appointment
+                </button>
+            </div>
+        </form>
+        {% elif selected_doctor_id and selected_date %}
+            <div class="alert alert-info text-center">No time slots available for selected date.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'doctor/doctor_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <div class="page-header text-center mb-4">
+        <h2 class="text-uppercase">Prescribe Patient</h2>
+        <p class="lead">For: <strong>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</strong></p>
+    </div>
+
+
+    <div class="card mb-4 shadow-sm border-0 rounded-4">
+        <div class="card-body">
+            <h5 class="text mb-3" style="color:#003366;"><i class="fas fa-user me-2"></i>Patient Details</h5>
+            <div class="row">
+                <div class="col-md-4"><strong>Username:</strong> {{ appointment.patient.username }}</div>
+                <div class="col-md-4"><strong>Email:</strong> {{ appointment.patient.email }}</div>
+                <div class="col-md-4"><strong>Phone:</strong> {{ appointment.patient.phone }}</div>
+                <div class="col-md-4"><strong>Age:</strong> {{ appointment.patient.age }}</div>
+                <div class="col-md-4"><strong>Gender:</strong> {{ appointment.patient.gender }}</div>
+                <div class="col-md-4"><strong>Blood Group:</strong> {{ appointment.patient.blood_group }}</div>
+                <div class="col-md-12 mt-2"><strong>Address:</strong> {{ appointment.patient.address }}</div>
+            </div>
+
+            <hr class="my-4">
+
+            <h6><i class="fas fa-calendar-check me-2"></i>Appointment Info</h6>
+            <p class="mb-1"><strong>Date:</strong> {{ appointment.date }}</p>
+            <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+        </div>
+    </div>
+
+
+    <div class="card shadow border-0 rounded-4 mb-5">
+        <div class="card-body">
+            <h5 class="mb-4" style="color:#003366;"><i class="fas fa-prescription-bottle-alt me-2"></i>Write Prescription</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Diagnosis</label>
+                    <textarea name="diagnosis" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Medications</label>
+                    <textarea name="medications" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Additional Notes</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-paper-plane me-1"></i> Submit Prescription
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+            <h5 class="mb-4" style="color:#002244;"><i class="fas fa-file-medical-alt me-2"></i>Past Prescriptions</h5>
+
+            {% if prescriptions %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center">
+                        <thead class="text-white" style="background-color:#002244;">
+                            <tr>
+                                <th>Date</th>
+                                <th>Diagnosis</th>
+                                <th>Medications</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pres in prescriptions %}
+                                <tr>
+                                    <td>{{ pres.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td>{{ pres.diagnosis }}</td>
+                                    <td>{{ pres.medications }}</td>
+                                    <td>{{ pres.notes }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">No prescriptions found for this patient.</div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'doctor/doctor_base.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="page-header">
+        <h2>👥 All Patients</h2>
+        <p class="lead">Browse and access the medical records of your patients.</p>
+    </div>
+
+    {% if patients %}
+    <div class="table-responsive">
+        <table class="table table-hover table-borderless mb-0 align-middle">
+            <thead class="text-white">
+                <tr style="background-color: #002244;">
+                    <th>NO.</th>
+                    <th>Name</th>
+                    <th>Place</th>
+                    <th>Email</th>
+                      <th>Age</th>
+                    <th>Blood Group</th>
+                    <th>Phone</th>
+                    <th>Gender</th>
+                    <th>Date Joined</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ patient.username|default:"—" }}</td>
+                    <td>{{ patient.place|default:"—" }}</td>
+                    <td>{{ patient.email|default:"—" }}</td>
+                     <td>{{ patient.age|default:"—" }}</td>
+                    <td>{{ patient.blood_group|upper|default:"—" }}</td>
+                    <td>{{ patient.phone|default:"—" }}</td>
+                    <td>{{ patient.gender|capfirst|default:"—" }}</td>
+                    <td>{{ patient.date_joined|date:"F d, Y" }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'view_patient_history' patient.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-notes-medical me-1"></i>View History
+                        </a>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i>No patients found in the system.</div>
+    {% endif %}
+</div>
+{% endblock %}
